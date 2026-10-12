@@ -2,26 +2,13 @@
 
 Minimal Python project structure for a Minecraft ↔ Discord link bot with commands beyond basic ping/help style commands.
 
-(UPDATE) All ai lines removed and starting from scratch as human typed 
+AI used only to route messages to discord but planning on learning how to do myself. Specifically discordsend(message)
 
 Working on the dashboard while using other dashboards as guidance.
 
-## File Tree
+## Installation
 
-```text
-mcdiscordlinkbutbetter/
-├── mcdiscordlinkbutbetter/
-│   ├── __init__.py
-│   └── bot.py
-├── tests/
-│   └── test_bot.py
-├── main.py
-└── README.md
-```
+Install the required Minecraft RCON package:
 
-## Example Commands
-
-- `link <discord_user_id> <minecraft_username>`
-- `unlink <discord_user_id>`
-- `profile <discord_user_id>`
-- `linkchannel <guild_id> <channel_id>`
+```powershell
+py -m pip install mcrcon
