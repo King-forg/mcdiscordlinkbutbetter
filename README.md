@@ -2,6 +2,8 @@
 
 Minimal Python project structure for a Minecraft ↔ Discord link bot with commands beyond basic ping/help style commands.
 
+(UPDATE) All ai lines removed and starting from scratch as human typed 
+
 Working on the dashboard while using other dashboards as guidance.
 
 ## File Tree
