@@ -66,4 +66,7 @@ while True:
                     log("No players online")
                 else:
                     log(f"{players} players online")
+    except Exception as e:
+        log(f"Error: {e}")
+        
 
