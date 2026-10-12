@@ -1,10 +1,10 @@
 from mcrcon import MCRcon
 import re
 
-domain = "192.168.0.20"
+domain = "domain"
 port = 25575
-secret = "805080"
-webhook_url = "https://discord.com/api/webhooks/1559239626361675927/eDvGebjtRlOcPqSwj6HyxkhDde5gdRyfd1sjDsBch0djc51bcAV1zBspfPPI7hBwiTA2"
+secret = "secret"
+webhook_url = "webhook"
 
 errors = False
 
