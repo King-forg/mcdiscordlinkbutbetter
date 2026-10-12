@@ -3,7 +3,7 @@ from mcrcon import MCRcon
 domain = "mc.kingf.org"
 port = 25575
 secret = "*****"
-webhook_url = "https://discord.com/api/webhooks/1559206097192230935/akpdm6-uxFkpw7fsjbjpPOr8du-ayC3BKWbvLlLX2ugG2ToyRBMxTzv7QMeFyTs7QxAS"
+webhook_url = "webhookurl"
 
 errors = False
 
