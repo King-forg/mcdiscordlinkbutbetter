@@ -1,9 +1,0 @@
-2026-10-13 17:22:16 Current player count: 0
-2026-10-13 17:22:29 Raw whitelist response: There are 8 whitelisted player(s): JensJ001S, BR00K512, TawnyMarlin5272, IT_0, LeafysNotHere, .Yeetus_deletusd, pizzaking9717, KingForg
-2026-10-13 17:22:29 IT_0 is whitelisted
-2026-10-13 17:22:36 Failed to whitelist IT_0. Response: Player is already whitelisted
-2026-10-13 17:22:47 IT_0 has been removed from the whitelist
-2026-10-13 17:23:09 Custom selected.
-2026-10-13 17:23:17 Response: 
-2026-10-13 17:23:17 Probably worked for some commands, but not all. Check the server for results.
-2026-10-13 17:23:29 Exiting the program.

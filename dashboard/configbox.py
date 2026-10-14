@@ -1,5 +1,6 @@
-chat-id = "xxxxxxx"
-webhook_url = "https://discord.com/api/webhooks/xxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-domain = "xxxxxxx"
+chat_id = "xxxxxxx"
+userid = "xxxxxxx"
+discord_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+domain = "0.0.0.0"
 port = 25575
-secret = "z"
+secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
