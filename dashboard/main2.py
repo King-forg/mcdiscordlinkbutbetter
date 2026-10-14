@@ -4,8 +4,16 @@ from multiprocessing.util import debug
 import os
 from mcrcon import MCRcon
 import re
+<<<<<<< HEAD
 import configbox
 import datetime
+=======
+
+domain = "domain"
+port = 25575
+secret = "secret"
+webhook_url = "webhook"
+>>>>>>> 8fedbd605b591680cde6dd99b8b41127a848193a
 
 errors = False
 
