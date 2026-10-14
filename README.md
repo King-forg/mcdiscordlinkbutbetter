@@ -30,7 +30,7 @@ Start the dashboard from the `dashboard` directory:
 
 ```powershell
 Set-Location dashboard
-python main2.py
+python main.py
 ```
 
 The program connects to Discord and then displays an interactive menu. Enter
