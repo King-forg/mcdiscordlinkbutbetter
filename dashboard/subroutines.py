@@ -51,6 +51,26 @@ def outputline(line):
     with LOG_FILE.open("a") as writefile:
         writefile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + line + "\n")
 
+def restart_server():
+    try:
+        with MCRcon(configbox.domain, configbox.secret) as mcr:
+            response = mcr.command("restart")
+            outputline(f"Server started. Response: {response}")
+    except Exception as e:
+        outputline(f"Error stopping the server: {e}")
+        global errors
+        errors = True
+
+def stop_server():
+    try:
+        with MCRcon(configbox.domain, configbox.secret) as mcr:
+            response = mcr.command("stop")
+            outputline(f"Server stopped. Response: {response}")
+    except Exception as e:
+        outputline(f"Error stopping the server: {e}")
+        global errors
+        errors = True
+
 def get_whitelist():
     playerselect = input("Enter player name: ")
     with MCRcon(configbox.domain, configbox.secret) as mcr:
@@ -84,6 +104,20 @@ def _whitelist_player(whitelistplayer):
         outputline(f"Error: {e}")
         global errors
         errors = True
+
+def get_server_status():
+    try:
+        with MCRcon(configbox.domain, configbox.secret) as mcr:
+            response = mcr.command("list")
+            if "There are" in response:
+                return "Online"
+            else:
+                return "Offline"
+    except Exception as e:
+        outputline(f"Error: {e}")
+        global errors
+        errors = True
+        return "Error"
 
 async def whitelist_player(whitelistplayer):
     return await asyncio.to_thread(_whitelist_player, whitelistplayer)

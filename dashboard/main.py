@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 from genericpath import exists
 import os
 import discord
@@ -30,6 +30,36 @@ class Client(discord.Client):
                 subroutines.outputline(f"Received player count command: {message.content}")
                 player_count = await subroutines.get_player_count()
                 await message.channel.send(f"Current player count: {player_count}")
+            elif message.content.startswith("/whitelist list"):
+                subroutines.outputline(f"Received whitelist list command: {message.content}")
+                await subroutines.get_whitelist()
+            elif message.content.startswith("/list"):
+                subroutines.outputline(f"Received list command: {message.content}")
+                await subroutines.get_online_players()
+            elif message.content.startswith("/help"):
+                subroutines.outputline(f"Received help command: {message.content}")
+                help_message = (
+                    "Available commands:\n"
+                    "/whitelist add <player> - Add a player to the whitelist.\n"
+                    "/whitelist remove <player> - Remove a player from the whitelist.\n"
+                    "/whitelist list - List all whitelisted players.\n"
+                    "/list - List all online players.\n"
+                    "/playercount - Get the current player count.\n"
+                    "/custom <command> - Execute a custom command on the server."
+                )
+                await message.channel.send(help_message)
+            elif message.content.startswith("/restart"):
+                subroutines.outputline(f"Received restart command. Restarting server in 3s...")
+                time.sleep(3)
+                await subroutines.restart_server()
+            elif message.content.startswith("/stop"):
+                subroutines.outputline(f"Received stop command. Stopping server in 3s...")
+                time.sleep(3)
+                await subroutines.stop_server()
+            elif message.content.startswith("/status"):
+                subroutines.outputline(f"Received status command: {message.content}")
+                server_status = await subroutines.get_server_status()
+                await message.channel.send(f"Server status: {server_status}")
             elif message.content.startswith("/custom"):
                 subroutines.outputline(f"Received custom command: {message.content}")
                 custom_command = message.content.removeprefix("/custom ")
