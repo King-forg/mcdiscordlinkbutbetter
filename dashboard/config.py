@@ -1,3 +1,0 @@
-WEBHOOK_URL = "PASTE_DISCORD_WEBHOOK_URL_HERE"
-HOST = "mc.kingf.org"
-PASSWORD = "*****"
