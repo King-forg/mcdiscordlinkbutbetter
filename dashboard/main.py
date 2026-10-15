@@ -15,7 +15,6 @@ time.sleep(0.5)
 print(Style.RESET_ALL + "Enter 'n' in the next prompt to continue in normal mode or 7 for demomode.")
 time.sleep(1.5)
 
-
 demomode = input(Back.GREEN + Fore.RED + "Attempting to connect to discord bot. You can use demomode if you have not set up a discord bot yet. Do you want to use demomode? (y/n): ")
 if configbox.discord_token == "placeholder":
     print(Back.RED + Fore.GREEN + "You haven't changed the Discord token value! Please change or continue on demo mode.")
@@ -123,6 +122,8 @@ except:
         print(Back.RED + Fore.GREEN + "Please set discord token in configbox!!")
         time.sleep(0.5)
         print(Back.RED + Fore.GREEN + "Please set discord token in configbox!!!")
+        print("You can find discord bot token in discord developer portal, your bot, bot section, click reset token and copy the token and paste it in configbox.py")
+        print("https://discord.com/developers/applications")
         time.sleep(3)
         print(Style.RESET_ALL + ".")
     else:
