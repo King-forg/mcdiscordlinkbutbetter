@@ -46,9 +46,11 @@ webhook URLs, or bot tokens to the repository.
 Start the dashboard from the `dashboard` directory:
 
 ```powershell
-Set-Location dashboard
+cd dashboard
 python main.py
 ```
+
+Please read error messages if you get them and fix problems it says. If its highlighted in red, change configbox.py
 
 The program connects to Discord and then displays an interactive menu. Enter
 `exit` to stop it.

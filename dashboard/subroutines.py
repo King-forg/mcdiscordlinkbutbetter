@@ -12,6 +12,8 @@ LOG_DIR = Path(__file__).resolve().parent.parent / "log"
 LOG_DIR.mkdir(exist_ok=True)
 LOG_FILE = LOG_DIR / "log.txt"
 
+error = False
+
 if LOG_FILE.exists():
     rotated_log = LOG_DIR / f"log{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
     LOG_FILE.rename(rotated_log)
@@ -20,6 +22,7 @@ def demomodeoutputline():
     outputline("Demomode is enabled. Message recieved but cannot be processed because the discord bot is not connected to a Minecraft server. Please set up a discord bot and connect it to a Minecraft server to use this feature.")
 
 def _get_player_count():
+    global error
     try:
         with MCRcon(configbox.domain, configbox.secret) as mcr:
             response = mcr.command("list")
@@ -33,12 +36,11 @@ def _get_player_count():
                 return None
     except Exception as e:
         if main.demomode == True:
-            errors = False
+            error = False
             demomodeoutputline()
         else:
             outputline(f"Error: {e}")
-            global errors
-            errors = True
+            error = True
             return None
 
 async def get_player_count():
@@ -51,12 +53,12 @@ def mcserverconnection():
             outputline(f"Successfully connected to the Minecraft server. Response: {response}")
     except Exception as e:
         outputline(f"Error connecting to the Minecraft server: {e}")
-        global errors
-        errors = True
+        global error
+        error = True
         if main.demomode == True:
-            errors = False 
+            error = False 
         else:
-            errors = True
+            error = True
 
 def outputline(line):
     print(line)
@@ -64,32 +66,32 @@ def outputline(line):
         writefile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + line + "\n")
 
 def restart_server():
-    global errors
+    global error
     try:
         with MCRcon(configbox.domain, configbox.secret) as mcr:
             response = mcr.command("restart")
             outputline(f"Server started. Response: {response}")
     except Exception as e:
         if main.demomode == True:
-            errors = False
+            error = False
             demomodeoutputline()
         else:
             outputline(f"Error restarting the server: {e}")
-        errors = True
+        error = True
 
 def stop_server():
-    global errors
+    global error
     try:
         with MCRcon(configbox.domain, configbox.secret) as mcr:
             response = mcr.command("stop")
             outputline(f"Server stopped. Response: {response}")
     except Exception as e:
         if main.demomode == True:
-            errors = False
+            error = False
             demomodeoutputline()
         else:
             outputline(f"Error stopping the server: {e}")
-            errors = True
+            error = True
 
 
 def get_whitelist():
@@ -123,8 +125,12 @@ def _whitelist_player(whitelistplayer):
                 outputline(f"Failed to whitelist {whitelistplayer}. Response: {response}")
     except Exception as e:
         outputline(f"Error: {e}")
-        global errors
-        errors = True
+        global error
+        error = True
+        if main.demomode == True:
+            error = False 
+        else:
+            error = True
 
 def get_server_status():
     try:
@@ -136,9 +142,14 @@ def get_server_status():
                 return "Offline"
     except Exception as e:
         outputline(f"Error: {e}")
-        global errors
-        errors = True
-        return "Error"
+        global error
+        error = True
+        if main.demomode == True:
+            error = False 
+            return error
+        else:
+            error = True
+            return error
 
 async def whitelist_player(whitelistplayer):
     return await asyncio.to_thread(_whitelist_player, whitelistplayer)
@@ -153,8 +164,12 @@ def _remove_whitelist_player(whitelistplayer):
                 outputline(f"Failed to remove {whitelistplayer} from the whitelist. Response: {response}")
     except Exception as e:
         outputline(f"Error: {e}")
-        global errors
-        errors = True
+        global error
+        error = True
+        if main.demomode == True:
+            error = False 
+        else:
+            error = True
 
 async def remove_whitelist_player(whitelistplayer):
     return await asyncio.to_thread(_remove_whitelist_player, whitelistplayer)
@@ -171,8 +186,12 @@ def _custom_command(custom_command):
                 custom()
     except Exception as e:
         outputline(f"Error: {e}")
-        global errors
-        errors = True
+        global error
+        error = True
+        if main.demomode == True:
+            error = False 
+        else:
+            error = True
 
 async def custom_command(custom_command):
     return await asyncio.to_thread(_custom_command, custom_command)
