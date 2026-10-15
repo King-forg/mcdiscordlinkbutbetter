@@ -15,12 +15,29 @@ py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
+In VS Code, select the project virtual environment as the Python interpreter:
+
+1. Open the Command Palette with `Ctrl+Shift+P`.
+2. Run `Python: Select Interpreter`.
+3. Choose `.venv\Scripts\python.exe`.
+
 Install the required packages:
 
 ```powershell
 python -m pip install --upgrade pip
 python -m pip install mcrcon discord.py
 ```
+
+The package is installed as `discord.py`, but it is imported in Python as
+`discord`. Confirm that the selected interpreter can import it:
+
+```powershell
+python -c "import discord; print(discord.__version__)"
+```
+
+If this check fails, activate `.venv` again and install with `python -m pip`
+instead of running `pip` directly. Using `python -m pip` ensures that the
+package is installed into the same Python environment that runs the dashboard.
 
 Set the Minecraft RCON and Discord bot values in
 [`dashboard/configbox.py`](dashboard/configbox.py). Do not commit real passwords,
