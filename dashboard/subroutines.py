@@ -5,7 +5,7 @@ import discord
 import re
 from pathlib import Path
 from mcrcon import MCRcon
-import main
+import colorama
 
 
 LOG_DIR = Path(__file__).resolve().parent.parent / "log"
@@ -13,13 +13,43 @@ LOG_DIR.mkdir(exist_ok=True)
 LOG_FILE = LOG_DIR / "log.txt"
 
 error = False
+demomode = False
 
 if LOG_FILE.exists():
     rotated_log = LOG_DIR / f"log{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
     LOG_FILE.rename(rotated_log)
 
+def _get_online_players():
+    global error
+    try:
+        with MCRcon(configbox.domain, configbox.secret) as mcr:
+            response = mcr.command("list")
+            match = re.search(r"players online: (.*)", response)
+            if match:
+                players = match.group(1)
+                outputline(f"Online players: {players}")
+                return players
+            else:
+                outputline("Couldn't parse server response")
+                return None
+    except Exception as e:
+        if demomode:
+            error = False
+            demomodeoutputline()
+        else:
+            outputline(f"Error: {e}")
+            error = True
+            return None
+
 def demomodeoutputline():
-    outputline("Demomode is enabled. Message recieved but cannot be processed because the discord bot is not connected to a Minecraft server. Please set up a discord bot and connect it to a Minecraft server to use this feature.")
+    print(colorama.Fore.YELLOW + "Demomode is enabled. Message recieved but cannot be processed because the discord bot is not connected to a Minecraft server. Please set up a discord bot and connect it to a Minecraft server to use this feature.")
+
+def set_demomode(enabled):
+    global demomode
+    demomode = enabled
+
+async def get_online_players():
+    return await asyncio.to_thread(_get_online_players)
 
 def _get_player_count():
     global error
@@ -35,7 +65,7 @@ def _get_player_count():
                 outputline("Couldn't parse server response")
                 return None
     except Exception as e:
-        if main.demomode == True:
+        if demomode:
             error = False
             demomodeoutputline()
         else:
@@ -55,7 +85,7 @@ def mcserverconnection():
         outputline(f"Error connecting to the Minecraft server: {e}")
         global error
         error = True
-        if main.demomode == True:
+        if demomode:
             error = False 
         else:
             error = True
@@ -72,7 +102,7 @@ def restart_server():
             response = mcr.command("restart")
             outputline(f"Server started. Response: {response}")
     except Exception as e:
-        if main.demomode == True:
+        if demomode:
             error = False
             demomodeoutputline()
         else:
@@ -86,16 +116,14 @@ def stop_server():
             response = mcr.command("stop")
             outputline(f"Server stopped. Response: {response}")
     except Exception as e:
-        if main.demomode == True:
+        if demomode:
             error = False
             demomodeoutputline()
         else:
             outputline(f"Error stopping the server: {e}")
             error = True
 
-
-def get_whitelist():
-    playerselect = input("Enter player name: ")
+def get_whitelist(playerselect):
     with MCRcon(configbox.domain, configbox.secret) as mcr:
         response = mcr.command(f"whitelist list")
         match = re.search(playerselect, response)
@@ -127,7 +155,7 @@ def _whitelist_player(whitelistplayer):
         outputline(f"Error: {e}")
         global error
         error = True
-        if main.demomode == True:
+        if demomode:
             error = False 
         else:
             error = True
@@ -144,7 +172,7 @@ def get_server_status():
         outputline(f"Error: {e}")
         global error
         error = True
-        if main.demomode == True:
+        if demomode:
             error = False 
             return error
         else:
@@ -166,7 +194,7 @@ def _remove_whitelist_player(whitelistplayer):
         outputline(f"Error: {e}")
         global error
         error = True
-        if main.demomode == True:
+        if demomode:
             error = False 
         else:
             error = True
@@ -188,7 +216,7 @@ def _custom_command(custom_command):
         outputline(f"Error: {e}")
         global error
         error = True
-        if main.demomode == True:
+        if demomode:
             error = False 
         else:
             error = True

@@ -51,6 +51,7 @@ python main.py
 ```
 
 Please read error messages if you get them and fix problems it says. If its highlighted in red, change configbox.py
+Python may throw out some "global error" errors. It should still work if you run it however if it runs continuously then it is broken. (Feel free to dm me anywhere)
 
 The program connects to Discord and then displays an interactive menu. Enter
 `exit` to stop it.

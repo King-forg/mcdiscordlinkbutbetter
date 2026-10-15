@@ -1,6 +1,7 @@
 from datetime import datetime, time
 from genericpath import exists
 import os
+import colorama
 import discord
 import subroutines
 import configbox
@@ -32,6 +33,7 @@ if demomode.lower() == "y":
     demomode = True
 else:
     demomode = False
+subroutines.set_demomode(demomode)
 
 class Client(discord.Client):
     async def on_ready(self):
@@ -108,4 +110,22 @@ except:
     else:
         print(Back.RED + Fore.GREEN + "Fatal Error. Check token is valid or is typed correctly.")
         print(Style.RESET_ALL + ".")
-
+    if demomode == True:
+        print(
+        "Available commands:\n"
+        "get_player_count() - Add a player to the whitelist.\n"
+        "remove_whitelist_player(whitelistplayer) - Remove a player from the whitelist.\n"
+        "get_whitelist(playerselect) - List all whitelisted players.\n"
+        "whitelist_player(whitelistplayer) - Whitelist a player. \n"
+        "get_online_players() - List all online players.\n"
+        "get_player_count() - Get the current player count.\n"
+        "custom_command - Execute a custom command on the server.")
+        while demomode == True:
+            command = input("Enter command: ")
+            print("Recieved command: " + command)
+            print(colorama.Fore.YELLOW + "Demomode is enabled. Message recieved but cannot be processed because the discord bot is not connected to a Minecraft server. Please set up a discord bot and connect it to a Minecraft server to use this feature.")
+            print(colorama.Style.RESET_ALL)
+            if command == "exit":
+                demomode = False
+    
+ 
