@@ -183,7 +183,7 @@ def _custom_command(custom_command):
                 outputline("Probably worked for some commands, but not all. Check the server for results.")
             if "Error" in response:
                 outputline(f"Error executing command: {response}")
-                custom()
+                custom_command()
     except Exception as e:
         outputline(f"Error: {e}")
         global error
