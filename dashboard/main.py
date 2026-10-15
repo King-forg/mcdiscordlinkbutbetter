@@ -5,12 +5,20 @@ import discord
 import subroutines
 import configbox
 
+demomode = input("Attempting to connect to discord bot. You can use demomode if you have not set up a discord bot yet. Do you want to use demomode? (y/n): ")
+if demomode.lower() == "y":
+    print("Demomode enabled. Discord bot will not be connected.")
+    demomode = True
+else:
+    demomode = False
+
 class Client(discord.Client):
     async def on_ready(self):
         subroutines.outputline(f"Logged in as {self.user} (ID: {self.user.id})")
         subroutines.outputline("------")
         subroutines.outputline("Discord bot is ready.")
-        subroutines.mcserverconnection()
+        if not demomode:
+            subroutines.mcserverconnection()
 
     async def on_message(self, message):
         if message.author == self.user:
