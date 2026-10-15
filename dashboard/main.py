@@ -10,6 +10,12 @@ import time
 
 errors = 0
 
+print(Back.GREEN + Fore.RED + "Starting connections... Watch for errors. If you see any errors, please check your configbox.py file and make sure all values are set correctly.")
+time.sleep(0.5)
+print(Style.RESET_ALL + "Enter 'n' in the next prompt to continue in normal mode or 7 for demomode.")
+time.sleep(1.5)
+
+
 demomode = input(Back.GREEN + Fore.RED + "Attempting to connect to discord bot. You can use demomode if you have not set up a discord bot yet. Do you want to use demomode? (y/n): ")
 if configbox.discord_token == "placeholder":
     print(Back.RED + Fore.GREEN + "You haven't changed the Discord token value! Please change or continue on demo mode.")
