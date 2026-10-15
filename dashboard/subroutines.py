@@ -5,6 +5,7 @@ import discord
 import re
 from pathlib import Path
 from mcrcon import MCRcon
+import main
 
 
 LOG_DIR = Path(__file__).resolve().parent.parent / "log"
@@ -14,6 +15,9 @@ LOG_FILE = LOG_DIR / "log.txt"
 if LOG_FILE.exists():
     rotated_log = LOG_DIR / f"log{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
     LOG_FILE.rename(rotated_log)
+
+def demomodeoutputline():
+    outputline("Demomode is enabled. Message recieved but cannot be processed because the discord bot is not connected to a Minecraft server. Please set up a discord bot and connect it to a Minecraft server to use this feature.")
 
 def _get_player_count():
     try:
@@ -28,10 +32,14 @@ def _get_player_count():
                 outputline("Couldn't parse server response")
                 return None
     except Exception as e:
-        outputline(f"Error: {e}")
-        global errors
-        errors = True
-        return None
+        if main.demomode == True:
+            errors = False
+            demomodeoutputline()
+        else:
+            outputline(f"Error: {e}")
+            global errors
+            errors = True
+            return None
 
 async def get_player_count():
     return await asyncio.to_thread(_get_player_count)
@@ -45,6 +53,10 @@ def mcserverconnection():
         outputline(f"Error connecting to the Minecraft server: {e}")
         global errors
         errors = True
+        if main.demomode == True:
+            errors = False 
+        else:
+            errors = True
 
 def outputline(line):
     print(line)
@@ -52,24 +64,33 @@ def outputline(line):
         writefile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + line + "\n")
 
 def restart_server():
+    global errors
     try:
         with MCRcon(configbox.domain, configbox.secret) as mcr:
             response = mcr.command("restart")
             outputline(f"Server started. Response: {response}")
     except Exception as e:
-        outputline(f"Error stopping the server: {e}")
-        global errors
+        if main.demomode == True:
+            errors = False
+            demomodeoutputline()
+        else:
+            outputline(f"Error restarting the server: {e}")
         errors = True
 
 def stop_server():
+    global errors
     try:
         with MCRcon(configbox.domain, configbox.secret) as mcr:
             response = mcr.command("stop")
             outputline(f"Server stopped. Response: {response}")
     except Exception as e:
-        outputline(f"Error stopping the server: {e}")
-        global errors
-        errors = True
+        if main.demomode == True:
+            errors = False
+            demomodeoutputline()
+        else:
+            outputline(f"Error stopping the server: {e}")
+            errors = True
+
 
 def get_whitelist():
     playerselect = input("Enter player name: ")
