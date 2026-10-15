@@ -6,6 +6,7 @@ import discord
 import subroutines
 import configbox
 from colorama import Fore, Back, Style
+import time
 
 errors = 0
 
@@ -13,20 +14,26 @@ demomode = input(Back.GREEN + Fore.RED + "Attempting to connect to discord bot. 
 if configbox.discord_token == "placeholder":
     print(Back.RED + Fore.GREEN + "You haven't changed the Discord token value! Please change or continue on demo mode.")
     errors = errors+1
+    time.sleep(0.5)
 if configbox.domain == "0.0.0.0":
     print(Back.RED + Fore.GREEN + "You haven't changed the domain value! Please change or continue on demo mode.")
     errors = errors+1
+    time.sleep(0.5)
 if configbox.secret == "placeholder":
     print(Back.RED + Fore.GREEN + "You haven't changed the secret value! Please change or continue on demo mode.")
     errors = errors+1
+    time.sleep(0.5)
 if configbox.chat_id == "placeholder":
     print(Back.RED + Fore.GREEN + "Still placeholder for chat_id but program will still run (Might break.)")
     errors = errors+1
+    time.sleep(0.5)
 if configbox.port == 25575:
     print(Back.RED + Fore.GREEN + "Port is 25575. Will work if port in server.properties is set to 25575.")
     errors = errors+1
+    time.sleep(0.5)
 if errors > 4:
     print(Back.RED + Fore.GREEN + Style.BRIGHT + "Many errors in configbox. Please double check that fields are entered correctly and are actually set to proper values.")
+    time.sleep(1)
 print(Style.RESET_ALL + ".")
 if demomode.lower() == "y":
     print("Demomode enabled. Discord bot will not be connected.")
@@ -105,12 +112,18 @@ try:
     client.run(configbox.discord_token)
 except:
     if configbox.discord_token == "placeholder":
-        print(Back.RED + Fore.GREEN + "Please set discord token in configbox")
+        print(Back.RED + Fore.GREEN + "Please set discord token in configbox!")
+        time.sleep(0.5)
+        print(Back.RED + Fore.GREEN + "Please set discord token in configbox!!")
+        time.sleep(0.5)
+        print(Back.RED + Fore.GREEN + "Please set discord token in configbox!!!")
+        time.sleep(3)
         print(Style.RESET_ALL + ".")
     else:
         print(Back.RED + Fore.GREEN + "Fatal Error. Check token is valid or is typed correctly.")
         print(Style.RESET_ALL + ".")
     if demomode == True:
+        time.sleep(1)
         print(
         "Available commands:\n"
         "get_player_count() - Add a player to the whitelist.\n"
