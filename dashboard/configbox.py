@@ -1,6 +1,6 @@
-chat_id = "placeholder"
-userid = "placeholder"
-discord_token = "placeholder"
+chat_id = "xxxxxxx"
+userid = "xxxxxxx"
+discord_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 domain = "0.0.0.0"
 port = 25575
-secret = "placeholder"
+secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
