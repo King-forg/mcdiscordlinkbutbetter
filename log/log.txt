@@ -1,0 +1,3 @@
+2026-10-16 12:00:11 Logged in as demomode (ID: demomode)
+2026-10-16 12:00:11 ------
+2026-10-16 12:00:11 [32mDiscord bot is ready.
