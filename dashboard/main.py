@@ -253,7 +253,7 @@ except Exception as exc:
         subroutines.outputline("------")
         subroutines.outputline(Fore.GREEN + "Discord bot is ready.")
         print(Style.RESET_ALL + "\n")
-        print("""       ⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣷⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        subroutines.outputline("""       ⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣷⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠀⠀⠀⠀⠀⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠀⠀⠀⠀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -293,9 +293,9 @@ except Exception as exc:
         ⣿⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢧⠀⠀⠀⠀⠀⠀⠈⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         I am the success cat. If you see this, the code works. Except for demo mode.""")
-        print(Fore.GREEN + "Bot is running and waiting for commands." + Style.RESET_ALL)
+        subroutines.outputline(Fore.GREEN + "Bot is running and waiting for commands." + Style.RESET_ALL)
         time.sleep(1)
-        print(
+        subroutines.outputline(
         "Available commands:\n"
         "get_player_count() - Add a player to the whitelist.\n"
         "remove_whitelist_player(whitelistplayer) - Remove a player from the whitelist.\n"
@@ -306,9 +306,9 @@ except Exception as exc:
         "custom_command - Execute a custom command on the server.")
         while demomode == True:
             command = input("Enter command: ")
-            print("Recieved command: " + command)
-            print(colorama.Fore.YELLOW + "Demomode is enabled. Message recieved but cannot be processed because the discord bot is not connected to a Minecraft server. Please set up a discord bot and connect it to a Minecraft server to use this feature.")
-            print(colorama.Style.RESET_ALL)
+            subroutines.outputline("Recieved command: " + command)
+            subroutines.outputline(colorama.Fore.YELLOW + "Demomode is enabled. Message recieved but cannot be processed because the discord bot is not connected to a Minecraft server. Please set up a discord bot and connect it to a Minecraft server to use this feature.")
+            subroutines.outputline(colorama.Style.RESET_ALL)
             if command == "exit":
                 demomode = False
     
