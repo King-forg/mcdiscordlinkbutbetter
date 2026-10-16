@@ -1,16 +1,19 @@
 import asyncio
 import configbox
 import datetime
-import discord
 import re
 from pathlib import Path
 from mcrcon import MCRcon
 import colorama
 
-
 LOG_DIR = Path(__file__).resolve().parent.parent / "log"
 LOG_DIR.mkdir(exist_ok=True)
 LOG_FILE = LOG_DIR / "log.txt"
+
+def outputline(line):
+    print(line)
+    with LOG_FILE.open("a") as writefile:
+        writefile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + line + "\n")
 
 error = False
 demomode = False
@@ -51,6 +54,24 @@ def set_demomode(enabled):
 async def get_online_players():
     return await asyncio.to_thread(_get_online_players)
 
+def _message(messageuser, messagetext):
+    try:
+        with MCRcon(configbox.domain, configbox.secret) as mcr:
+            response = mcr.command(f"/tellraw {messageuser}: {messagetext}")
+            return response
+    except Exception as e:
+        global error
+        error = True
+        if demomode:
+            error = False
+            demomodeoutputline()
+        else:
+            outputline(f"Error: {e}")
+        return
+
+async def message(messageuser,messagetext):
+    return await asyncio.to_thread(message(messageuser,messagetext))
+
 def _get_player_count():
     global error
     try:
@@ -89,11 +110,6 @@ def mcserverconnection():
             error = False 
         else:
             error = True
-
-def outputline(line):
-    print(line)
-    with LOG_FILE.open("a") as writefile:
-        writefile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + line + "\n")
 
 def restart_server():
     global error

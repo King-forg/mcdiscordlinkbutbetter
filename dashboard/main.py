@@ -1,11 +1,9 @@
-from datetime import datetime, time
+from datetime import time
 from genericpath import exists
-import os
 import discord
 import subroutines
 import configbox
 import time
-import asyncio
 import threading
 
 
@@ -33,7 +31,7 @@ errors = 0
 
 print(Back.GREEN + Fore.RED + "Starting connections... Watch for errors. If you see any errors, please check your configbox.py file and make sure all values are set correctly." + Style.RESET_ALL)
 time.sleep(0.5)
-print(Style.RESET_ALL + "Enter 'n' in the next prompt to continue in normal mode or 7 for demomode.")
+print(Style.RESET_ALL + "Enter 'n' in the next prompt to continue in normal mode or 'y' for demomode.")
 time.sleep(1.5)
 
 def ask_demomode():
@@ -62,6 +60,7 @@ demomode = ask_demomode()
 if configbox.discord_token == "placeholder":
     print(Back.RED + Fore.GREEN + "You haven't changed the Discord token value! Please change or continue on demo mode." + Style.RESET_ALL)
     errors = errors+1
+    fatalerrors = True
     time.sleep(0.5)
 if configbox.domain == "0.0.0.0":
     print(Back.RED + Fore.GREEN + "You haven't changed the domain value! Please change or continue on demo mode." + Style.RESET_ALL)
@@ -75,12 +74,20 @@ if configbox.chat_id == "placeholder":
     print(Back.RED + Fore.GREEN + "Still placeholder for chat_id but program will still run (Might break.)" + Style.RESET_ALL)
     errors = errors+1
     time.sleep(0.5)
+if configbox.userid == "placeholder":
+    print(Back.RED + Fore.GREEN + "Still placeholder for userid but program will still run (Might break.)" + Style.RESET_ALL)
+    errors = errors+1
+    time.sleep(0.5)
 if configbox.port == 25575:
     print(Style.RESET_ALL + Fore.YELLOW + "Port is 25575. Will work if port in server.properties is set to 25575." + Style.RESET_ALL)
     errors = errors+1
     time.sleep(0.5)
 if errors > 4:
     print(Back.RED + Fore.GREEN + Style.BRIGHT + "Many errors in configbox. Please double check that fields are entered correctly and are actually set to proper values.")
+    if demomode == True:
+        print(Back.YELLOW + Fore.GREEN + Style.BRIGHT + "Demomode is enabled. Program will continue to run but some features will not work.")
+    if fatalerrors == True:
+        print(Back.RED + Fore.GREEN + Style.BRIGHT + "Fatal errors detected. Please fix the errors in configbox.py and restart the program.")
     time.sleep(1)
 print(Style.RESET_ALL + ".")
 if demomode.lower() == "y":
@@ -191,6 +198,35 @@ class Client(discord.Client):
                 subroutines.outputline(f"Received custom command: {message.content}")
                 custom_command = message.content.removeprefix("/custom ")
                 await subroutines.custom_command(custom_command)
+
+    async def on_message(self, message):
+        if message.author == self.user:
+            return
+        if message.content.startswith("/whitelist add"):
+            return
+        elif message.content.startswith("/whitelist remove"):
+            return
+        elif message.content.startswith("/playercount"):
+            return
+        elif message.content.startswith("/whitelist list"):
+            return
+        elif message.content.startswith("/list"):
+            return
+        elif message.content.startswith("/help"):
+            return
+        elif message.content.startswith("/restart"):
+            return
+        elif message.content.startswith("/stop"):
+            return
+        elif message.content.startswith("/status"):
+            return
+        elif message.content.startswith("/custom"):        
+            return
+        else:
+            subroutines.outputline(f"Recieved message: {message.content} in {message.channel} by {message.author}. Embeds are: {message.embeds},{message.attachments}")
+            messageuser = message.author
+            messagetext = message.content
+            await subroutines.message(messageuser, messagetext)
 
                 
 intents = discord.Intents.default()
