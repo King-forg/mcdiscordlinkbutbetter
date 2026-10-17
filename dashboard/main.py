@@ -1,10 +1,11 @@
-from datetime import time
-from genericpath import exists
+import asyncio
 import discord
+from discord.ext import tasks
 import subroutines
 import configbox
 import time
 import threading
+from logtail import ChatLogTailer
 
 
 class _Colors:
@@ -16,6 +17,7 @@ class _Colors:
     class Back:
         RED = "\033[41m"
         GREEN = "\033[42m"
+        YELLOW = "\033[43m"
 
     class Style:
         BRIGHT = "\033[1m"
@@ -27,7 +29,8 @@ Fore = colorama.Fore
 Back = colorama.Back
 Style = colorama.Style
 
-errors = 0 
+errors = 0
+fatalerrors = False
 
 print(Back.GREEN + Fore.RED + "Starting connections... Watch for errors. If you see any errors, please check your configbox.py file and make sure all values are set correctly." + Style.RESET_ALL)
 time.sleep(0.5)
@@ -56,7 +59,7 @@ def ask_demomode():
     return "n"
 
 
-demomode = ask_demomode()
+demomode = ask_demomode().strip().lower() == "y"
 if configbox.discord_token == "placeholder":
     print(Back.RED + Fore.GREEN + "You haven't changed the Discord token value! Please change or continue on demo mode." + Style.RESET_ALL)
     print()
@@ -75,6 +78,11 @@ if configbox.secret == "placeholder":
     time.sleep(0.5)
 if configbox.chat_id == "placeholder":
     print(Back.RED + Fore.GREEN + "Still placeholder for chat_id but program will still run (Might break.)" + Style.RESET_ALL)
+    print()
+    errors = errors+1
+    time.sleep(0.5)
+if configbox.commandid == "placeholder":
+    print(Back.RED + Fore.GREEN + "Still placeholder for commandid but commands will not work until it is set." + Style.RESET_ALL)
     print()
     errors = errors+1
     time.sleep(0.5)
@@ -97,12 +105,14 @@ if errors > 4:
         print(Back.RED + Fore.GREEN + Style.BRIGHT + "Fatal errors detected. Please fix the errors in configbox.py and restart the program.")
     time.sleep(1)
 print(Style.RESET_ALL + ".")
-if demomode.lower() == "y":
+if demomode:
     print("Demomode enabled. Discord bot will not be connected.")
-    demomode = True
-else:
-    demomode = False
 subroutines.set_demomode(demomode)
+
+# Reads chat from the server's latest.log (configbox.logpath can be the file or its folder).
+chat_tail = ChatLogTailer(configbox.logpath)
+
+
 
 class Client(discord.Client):
     async def on_ready(self):
@@ -153,88 +163,95 @@ class Client(discord.Client):
         print(Fore.GREEN + "Bot is running and waiting for commands." + Style.RESET_ALL)
         if not demomode:
             subroutines.mcserverconnection()
+            if not chat_tail.path.exists():
+                subroutines.outputline(Fore.YELLOW + f"Server log not found at {chat_tail.path}. Check logpath in configbox.py." + Style.RESET_ALL)
+            if not self.relay_chat.is_running():
+                await asyncio.to_thread(chat_tail.read_new)  # mark the end of the log so old chat isn't replayed
+                self.relay_chat.start()
 
     async def on_message(self, message):
         if message.author == self.user:
             return
-        elif message.author.id == int(configbox.userid):
-            if message.content.startswith("/whitelist add"):
-                subroutines.outputline(f"Received whitelist add command: {message.content}")
-                whitelistplayer = message.content.removeprefix("/whitelist add ")
-                await subroutines.whitelist_player(whitelistplayer)
-                await message.channel.send(f"Added {whitelistplayer} to the whitelist.")
-            elif message.content.startswith("/whitelist remove"):
-                subroutines.outputline(f"Received whitelist remove command: {message.content}")
-                whitelistplayer = message.content.removeprefix("/whitelist remove ")
-                await subroutines.remove_whitelist_player(whitelistplayer)
-                await message.channel.send(f"Removed {whitelistplayer} from the whitelist.")
-            elif message.content.startswith("/playercount"):
-                subroutines.outputline(f"Received player count command: {message.content}")
-                player_count = await subroutines.get_player_count()
-                await message.channel.send(f"Current player count: {player_count}")
-            elif message.content.startswith("/whitelist list"):
-                subroutines.outputline(f"Received whitelist list command: {message.content}")
-                await subroutines.get_whitelist()
-            elif message.content.startswith("/list"):
-                subroutines.outputline(f"Received list command: {message.content}")
-                await subroutines.get_online_players()
-            elif message.content.startswith("/help"):
-                subroutines.outputline(f"Received help command: {message.content}")
-                help_message = (
-                    "Available commands:\n"
-                    "/whitelist add <player> - Add a player to the whitelist.\n"
-                    "/whitelist remove <player> - Remove a player from the whitelist.\n"
-                    "/whitelist list - List all whitelisted players.\n"
-                    "/list - List all online players.\n"
-                    "/playercount - Get the current player count.\n"
-                    "/custom <command> - Execute a custom command on the server."
-                )
-                await message.channel.send(help_message)
-            elif message.content.startswith("/restart"):
-                subroutines.outputline(f"Received restart command. Restarting server in 3s...")
-                time.sleep(3)
-                await subroutines.restart_server()
-            elif message.content.startswith("/stop"):
-                subroutines.outputline(f"Received stop command. Stopping server in 3s...")
-                time.sleep(3)
-                await subroutines.stop_server()
-            elif message.content.startswith("/status"):
-                subroutines.outputline(f"Received status command: {message.content}")
-                server_status = await subroutines.get_server_status()
-                await message.channel.send(f"Server status: {server_status}")
-            elif message.content.startswith("/custom"):
-                subroutines.outputline(f"Received custom command: {message.content}")
-                custom_command = message.content.removeprefix("/custom ")
-                await subroutines.custom_command(custom_command)
+        channel_id = str(message.channel.id)
 
-    async def on_message(self, message):
-        if message.author == self.user:
+        if channel_id == str(configbox.chat_id):
+            subroutines.outputline(
+                f"Received chat message: {message.content} in {message.channel} by {message.author}."
+            )
+            await subroutines.message(message.author, message.content)
             return
-        if message.content.startswith("/whitelist add"):
+
+        if channel_id != str(configbox.commandid):
             return
-        elif message.content.startswith("/whitelist remove"):
+        subroutines.outputline(
+            f"Received command-channel message: {message.content} in "
+            f"{message.channel} by {message.author}."
+        )
+        command = message.content.strip()
+        if command.startswith(("/", "!")):
+            command = command[1:]
+        command = command.strip()
+
+        if command.startswith("whitelist add"):
+            subroutines.outputline(f"Received whitelist add command: {message.content}")
+            whitelistplayer = command.removeprefix("whitelist add ").strip()
+            await subroutines.whitelist_player(whitelistplayer)
+            await message.channel.send(f"Added {whitelistplayer} to the whitelist.")
+        elif command.startswith("whitelist remove"):
+            subroutines.outputline(f"Received whitelist remove command: {message.content}")
+            whitelistplayer = command.removeprefix("whitelist remove ").strip()
+            await subroutines.remove_whitelist_player(whitelistplayer)
+            await message.channel.send(f"Removed {whitelistplayer} from the whitelist.")
+        elif command.startswith("playercount"):
+            subroutines.outputline(f"Received player count command: {message.content}")
+            player_count = await subroutines.get_player_count()
+            await message.channel.send(f"Current player count: {player_count}")
+        elif command.startswith("whitelist list"):
+            subroutines.outputline(f"Received whitelist list command: {message.content}")
+            whitelist = await subroutines.get_whitelist()
+            await message.channel.send(f"Whitelisted players: {whitelist}")
+        elif command == "list":
+            subroutines.outputline(f"Received list command: {message.content}")
+            players = await subroutines.get_online_players()
+            await message.channel.send(f"Online players: {players}")
+        elif command == "help":
+            subroutines.outputline(f"Received help command: {message.content}")
+            await message.channel.send(
+                "Available commands:\n"
+                "!whitelist add <player> - Add a player to the whitelist.\n"
+                "!whitelist remove <player> - Remove a player from the whitelist.\n"
+                "!whitelist list - List all whitelisted players.\n"
+                "!list - List all online players.\n"
+                "!playercount - Get the current player count.\n"
+                "!custom <command> - Execute a custom command on the server."
+            )
+        elif command == "restart":
+            subroutines.outputline("Received restart command. Restarting server in 3s...")
+            await asyncio.sleep(3)
+            await asyncio.to_thread(subroutines.restart_server)
+        elif command == "stop":
+            subroutines.outputline("Received stop command. Stopping server in 3s...")
+            await asyncio.sleep(3)
+            await asyncio.to_thread(subroutines.stop_server)
+        elif command == "status":
+            subroutines.outputline(f"Received status command: {message.content}")
+            server_status = await asyncio.to_thread(subroutines.get_server_status)
+            await message.channel.send(f"Server status: {server_status}")
+        elif command.startswith("custom"):
+            subroutines.outputline(f"Received custom command: {message.content}")
+            custom_command = command.removeprefix("custom ").strip()
+            await subroutines.custom_command(custom_command)
+
+    @tasks.loop(seconds=2)
+    async def relay_chat(self):
+        channel = self.get_channel(int(configbox.chat_id))
+        if channel is None:
             return
-        elif message.content.startswith("/playercount"):
-            return
-        elif message.content.startswith("/whitelist list"):
-            return
-        elif message.content.startswith("/list"):
-            return
-        elif message.content.startswith("/help"):
-            return
-        elif message.content.startswith("/restart"):
-            return
-        elif message.content.startswith("/stop"):
-            return
-        elif message.content.startswith("/status"):
-            return
-        elif message.content.startswith("/custom"):        
-            return
-        else:
-            subroutines.outputline(f"Recieved message: {message.content} in {message.channel} by {message.author}. Embeds are: {message.embeds},{message.attachments}")
-            messageuser = message.author
-            messagetext = message.content
-            await subroutines.message(messageuser, messagetext)
+        try:
+            for player, text in await asyncio.to_thread(chat_tail.read_new):
+                await channel.send(f"<{player}> {text}", allowed_mentions=discord.AllowedMentions.none())
+        except Exception as exc:
+            subroutines.outputline(f"Chat relay error: {exc}")
 
                 
 intents = discord.Intents.default()
@@ -311,5 +328,3 @@ except Exception as exc:
             subroutines.outputline(colorama.Style.RESET_ALL)
             if command == "exit":
                 demomode = False
-    
- 

@@ -1,6 +1,7 @@
 import asyncio
 import configbox
 import datetime
+import json
 import re
 from pathlib import Path
 from mcrcon import MCRcon
@@ -57,7 +58,7 @@ async def get_online_players():
 def _message(messageuser, messagetext):
     try:
         with MCRcon(configbox.domain, configbox.secret) as mcr:
-            response = mcr.command(f"/tellraw {messageuser}: {messagetext}")
+            response = mcr.command("tellraw @a " + json.dumps(f"{messageuser}: {messagetext}"))
             return response
     except Exception as e:
         global error
@@ -70,7 +71,7 @@ def _message(messageuser, messagetext):
         return
 
 async def message(messageuser,messagetext):
-    return await asyncio.to_thread(message(messageuser,messagetext))
+    return await asyncio.to_thread(_message, messageuser, messagetext)
 
 def _get_player_count():
     global error
@@ -139,25 +140,28 @@ def stop_server():
             outputline(f"Error stopping the server: {e}")
             error = True
 
-def get_whitelist(playerselect):
-    with MCRcon(configbox.domain, configbox.secret) as mcr:
-        response = mcr.command(f"whitelist list")
-        match = re.search(playerselect, response)
-        if match:
+def _get_whitelist(playerselect=None):
+    try:
+        with MCRcon(configbox.domain, configbox.secret) as mcr:
+            response = mcr.command("whitelist list")
+        if not playerselect:
+            outputline(f"Whitelisted players: {response}")
+            return response
+        if re.search(re.escape(playerselect), response):
             outputline(f"{playerselect} is whitelisted")
-            if playerselect == "":
-                try:
-                    with MCRcon(configbox.domain, configbox.secret) as mcr:
-                        response = mcr.command(f"list")
-                        match = re.search(playerselect, response)
-                        if match:
-                            outputline(f"{playerselect} is online")
-                        else:
-                            outputline(f"{playerselect} is offline")
-                except Exception as e:
-                    outputline(f"Error: {e}")
         else:
             outputline(f"{playerselect} is not whitelisted")
+        return response
+    except Exception as e:
+        outputline(f"Error: {e}")
+        global error
+        error = not demomode
+        if demomode:
+            demomodeoutputline()
+        return None
+
+async def get_whitelist(playerselect=None):
+    return await asyncio.to_thread(_get_whitelist, playerselect)
 
 def _whitelist_player(whitelistplayer):
     try:
@@ -227,7 +231,6 @@ def _custom_command(custom_command):
                 outputline("Probably worked for some commands, but not all. Check the server for results.")
             if "Error" in response:
                 outputline(f"Error executing command: {response}")
-                custom_command()
     except Exception as e:
         outputline(f"Error: {e}")
         global error
